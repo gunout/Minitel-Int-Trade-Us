@@ -27,6 +27,37 @@ app = Flask(__name__,
             template_folder='templates')
 CORS(app)
 
+# ============================================================
+# GESTION CORS ET REQUÊTES OPTIONS
+# ============================================================
+
+@app.before_request
+def handle_options():
+    """Gère les requêtes OPTIONS (CORS preflight)"""
+    if request.method == 'OPTIONS':
+        response = app.make_default_options_response()
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+        response.headers.add('Access-Control-Max-Age', '86400')
+        return response
+
+@app.after_request
+def after_request(response):
+    """Ajoute les en-têtes CORS après chaque requête"""
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+    response.headers.add('Access-Control-Max-Age', '86400')
+    response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
+    response.headers.add('Pragma', 'no-cache')
+    response.headers.add('Expires', '0')
+    return response
+
+# ============================================================
+# FUSEAU HORAIRE
+# ============================================================
+
 # Fuseau horaire US (New York)
 US_TIMEZONE = pytz.timezone('America/New_York')
 
